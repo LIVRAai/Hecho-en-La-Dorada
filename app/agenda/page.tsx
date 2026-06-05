@@ -1,0 +1,6 @@
+import type { Metadata } from "next";
+import { EventCard } from "@/components/cards";
+import { CategoryFilter, SectionTitle } from "@/components/ui";
+import { events } from "@/lib/data";
+export const metadata: Metadata = { title: "Agenda cultural", description: "Eventos culturales, talleres, ferias y actividades de La Dorada." };
+export default function AgendaPage() { return <section className="mx-auto max-w-7xl px-4 py-16"><SectionTitle eyebrow="Agenda cultural" title="Eventos para vivir la ciudad" description="Vista lista y calendario editorial para talleres, ferias, festivales, mercados, deportes y encuentros empresariales." /><CategoryFilter categories={["Cultura", "Talleres", "Ferias", "Festivales", "Mercados", "Deporte", "Empresarial"]} /><div className="mt-8 grid gap-5">{events.map((event) => <EventCard key={event.id} event={event} />)}</div><div className="mt-12 rounded-[2rem] bg-white p-6 shadow-editorial"><h2 className="font-serif text-3xl font-black">Vista calendario</h2><div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-5">{events.map((event) => <div key={event.id} className="rounded-2xl border border-suave/10 p-4"><p className="text-xs font-bold text-magdalena">{event.date}</p><p className="mt-2 font-semibold">{event.title}</p></div>)}</div></div></section>; }
