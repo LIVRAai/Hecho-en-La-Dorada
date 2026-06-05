@@ -28,11 +28,14 @@ export function AdminLoginForm() {
       setMessage("Faltan variables públicas de Supabase.");
       return;
     }
-    const { error } = await supabase.auth.signInWithPassword(parsed.data);
+    const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
     setLoading(false);
     if (error) {
       setMessage(error.message);
       return;
+    }
+    if (data.session?.access_token) {
+      document.cookie = `sb-access-token=${data.session.access_token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
     }
     router.replace(searchParams.get("redirectedFrom") ?? "/admin");
     router.refresh();

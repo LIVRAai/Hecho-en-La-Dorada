@@ -25,7 +25,7 @@ app/                      Rutas públicas, SEO, sitemap y robots
 components/               UI editorial reutilizable, cards, mapa y formularios
 lib/                      Tipos, consultas Supabase, helpers y cliente Supabase
 supabase/schema.sql       Esquema PostgreSQL, roles, RLS y políticas
-supabase/seed.sql         Semillas SQL iniciales
+supabase/seed.sql         Archivo vacío en producción; el contenido se crea desde el CMS
 .env.example              Variables de entorno necesarias
 ```
 
@@ -41,7 +41,7 @@ supabase/seed.sql         Semillas SQL iniciales
 - `/datos` dashboard editorial de indicadores.
 - `/oportunidades` muro comunitario moderable.
 - `/recomendar` formulario validado con Zod y guardado opcional en Supabase.
-- `/admin` dashboard base para administración y CRUD futuro.
+- `/admin` dashboard privado con módulos de CMS, biblioteca de medios y editor de inicio.
 
 ## Instalación local
 
@@ -57,16 +57,15 @@ Abre `http://localhost:3000`.
 
 1. Crea un proyecto en Supabase.
 2. Ejecuta `supabase/schema.sql` en el SQL editor.
-3. Ejecuta `supabase/seed.sql` para datos iniciales.
-4. Copia las llaves del proyecto en `.env.local`:
+3. No cargues datos de ejemplo en producción; `supabase/seed.sql` queda vacío y el contenido se crea desde `/admin`.
+4. Copia las llaves públicas del proyecto en `.env.local`:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://nvidjyavggljuukjmmmf.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_mEutHNmodVNOLCoclP3MDA_6l8VDx93
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```
 
-`NEXT_PUBLIC_SUPABASE_ANON_KEY` puede usar la publishable key de Supabase porque está diseñada para ejecutarse en el navegador. No publiques `SUPABASE_SERVICE_ROLE_KEY`: esa llave es privada y solo debe configurarse en entornos seguros del servidor si se agrega lógica administrativa.
+`NEXT_PUBLIC_SUPABASE_ANON_KEY` puede usar la publishable key de Supabase porque está diseñada para ejecutarse en el navegador. Esta implementación no requiere `SUPABASE_SERVICE_ROLE_KEY`; si agregas una llave de servicio en el futuro, mantenla solo en entornos seguros del servidor y nunca en componentes cliente.
 
 El formulario de recomendaciones inserta en la tabla `recommendations` con estado `Pendiente` cuando las variables públicas de Supabase están configuradas.
 
@@ -74,9 +73,16 @@ El formulario de recomendaciones inserta en la tabla `recommendations` con estad
 
 - Login privado en `/admin/login` usando Supabase Auth.
 - Middleware protege `/admin/*` y redirige a `/admin/login` cuando no existe sesión activa.
-- Layout independiente con sidebar, header, métricas, tablas, filtros, formularios y acciones de moderación.
-- Las operaciones administrativas usan la sesión del usuario y políticas RLS; no se expone `SUPABASE_SERVICE_ROLE_KEY` al navegador.
+- Layout independiente con sidebar, header, métricas, tablas, filtros, formularios, biblioteca `/admin/media` y editor `/admin/inicio`.
+- Las operaciones administrativas usan la sesión del usuario, Supabase Storage y políticas RLS; no se expone `SUPABASE_SERVICE_ROLE_KEY` al navegador.
 - Para conceder acceso, crea el usuario en Supabase Auth y registra su perfil con rol `Administrador` o `Editor` en la tabla `profiles`.
+
+## CMS y publicación
+
+- `/admin/media` sube imágenes al bucket público `media`, permite previsualizar, copiar URL y eliminar archivos.
+- `/admin/inicio` edita el hero público desde la tabla `site_home`.
+- Los formularios admin guardan contenido real en Supabase y usan `published` para mostrarlo en la web pública.
+- La página pública solo muestra proyectos, historias, episodios, eventos e indicadores con `published = true`; oportunidades usan `status = 'Publicada'`.
 
 ## Contenido real desde Supabase
 

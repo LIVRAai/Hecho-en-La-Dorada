@@ -9,6 +9,7 @@ export function AdminHeader() {
   async function signOut() {
     const supabase = getSupabaseBrowserClient();
     await supabase?.auth.signOut();
+    document.cookie = "sb-access-token=; path=/; max-age=0; SameSite=Lax";
     router.replace("/admin/login");
     router.refresh();
   }

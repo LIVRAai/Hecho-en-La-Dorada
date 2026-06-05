@@ -5,6 +5,8 @@
 :root {
   --background: #f7f1e3;
   --foreground: #1f1f1f;
+  --font-sans: Inter, system-ui, sans-serif;
+  --font-serif: Georgia, serif;
 }
 
 * { box-sizing: border-box; }

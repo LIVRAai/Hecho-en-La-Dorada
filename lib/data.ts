@@ -5,4 +5,4 @@ export type LegacyContentRecord = {
   category?: string;
 };
 
-// Demo content was intentionally removed. Public pages read real records from Supabase via lib/public-data.ts.
+// Public content is loaded from Supabase via lib/public-data.ts; this file only keeps legacy shared types.

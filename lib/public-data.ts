@@ -28,6 +28,31 @@ export type PublicEvent = { id: string; title: string; slug: string; date: strin
 export type PublicIndicator = { id: string; title: string; value: string; category: string; description: string; source?: string | null; trend?: number[] };
 export type PublicOpportunity = { id: string; title: string; category: string; description: string; contactName: string; contactPhone?: string | null; contactEmail?: string | null; status: string; createdAt: string };
 
+export type HomeSettings = {
+  id?: string;
+  heroTitle: string;
+  heroSubtitle: string;
+  heroBadge: string;
+  heroQuote: string;
+  heroImage?: string | null;
+  heroCtaPrimary: string;
+  heroCtaPrimaryUrl: string;
+  heroCtaSecondary: string;
+  heroCtaSecondaryUrl: string;
+};
+
+export const defaultHomeSettings: HomeSettings = {
+  heroTitle: "HECHO EN LA DORADA",
+  heroSubtitle: "Historias, personas y proyectos que construyen nuestra ciudad.",
+  heroBadge: "Plataforma editorial comunitaria",
+  heroQuote: "Aquí están pasando cosas buenas.",
+  heroImage: null,
+  heroCtaPrimary: "Explorar historias",
+  heroCtaPrimaryUrl: "/historias",
+  heroCtaSecondary: "Descubrir proyectos",
+  heroCtaSecondaryUrl: "/hecho-en-la-dorada"
+};
+
 function getPublicClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -45,10 +70,30 @@ async function safeQuery<T>(query: PromiseLike<{ data: T | null; error: unknown 
   }
 }
 
+
+export async function getHomeSettings(): Promise<HomeSettings> {
+  const supabase = getPublicClient();
+  if (!supabase) return defaultHomeSettings;
+  const row = await safeQuery<any | null>(supabase.from("site_home").select("*").order("updated_at", { ascending: false }).limit(1).maybeSingle(), null);
+  if (!row) return defaultHomeSettings;
+  return {
+    id: String(row.id),
+    heroTitle: row.hero_title ?? defaultHomeSettings.heroTitle,
+    heroSubtitle: row.hero_subtitle ?? defaultHomeSettings.heroSubtitle,
+    heroBadge: row.hero_badge ?? defaultHomeSettings.heroBadge,
+    heroQuote: row.hero_quote ?? defaultHomeSettings.heroQuote,
+    heroImage: row.hero_image,
+    heroCtaPrimary: row.hero_cta_primary ?? defaultHomeSettings.heroCtaPrimary,
+    heroCtaPrimaryUrl: row.hero_cta_primary_url ?? defaultHomeSettings.heroCtaPrimaryUrl,
+    heroCtaSecondary: row.hero_cta_secondary ?? defaultHomeSettings.heroCtaSecondary,
+    heroCtaSecondaryUrl: row.hero_cta_secondary_url ?? defaultHomeSettings.heroCtaSecondaryUrl
+  };
+}
+
 export async function getProjects(limit?: number) {
   const supabase = getPublicClient();
   if (!supabase) return [] as PublicProject[];
-  let query: any = supabase.from("projects").select("*").order("featured", { ascending: false }).order("created_at", { ascending: false });
+  let query: any = supabase.from("projects").select("*").eq("published", true).order("featured", { ascending: false }).order("created_at", { ascending: false });
   if (limit) query = query.limit(limit);
   const rows = await safeQuery<any[]>(query, []);
   return rows.map(mapProject);
@@ -57,14 +102,14 @@ export async function getProjects(limit?: number) {
 export async function getProjectBySlug(slug: string) {
   const supabase = getPublicClient();
   if (!supabase) return null;
-  const row = await safeQuery<any | null>(supabase.from("projects").select("*").eq("slug", slug).maybeSingle(), null);
+  const row = await safeQuery<any | null>(supabase.from("projects").select("*").eq("published", true).eq("slug", slug).maybeSingle(), null);
   return row ? mapProject(row) : null;
 }
 
 export async function getStories(limit?: number) {
   const supabase = getPublicClient();
   if (!supabase) return [] as PublicStory[];
-  let query: any = supabase.from("stories").select("*").order("featured", { ascending: false }).order("created_at", { ascending: false });
+  let query: any = supabase.from("stories").select("*").eq("published", true).order("featured", { ascending: false }).order("created_at", { ascending: false });
   if (limit) query = query.limit(limit);
   const rows = await safeQuery<any[]>(query, []);
   return rows.map(mapStory);
@@ -73,14 +118,14 @@ export async function getStories(limit?: number) {
 export async function getStoryBySlug(slug: string) {
   const supabase = getPublicClient();
   if (!supabase) return null;
-  const row = await safeQuery<any | null>(supabase.from("stories").select("*").eq("slug", slug).maybeSingle(), null);
+  const row = await safeQuery<any | null>(supabase.from("stories").select("*").eq("published", true).eq("slug", slug).maybeSingle(), null);
   return row ? mapStory(row) : null;
 }
 
 export async function getPodcastEpisodes(limit?: number) {
   const supabase = getPublicClient();
   if (!supabase) return [] as PublicPodcastEpisode[];
-  let query: any = supabase.from("podcast_episodes").select("*").order("created_at", { ascending: false });
+  let query: any = supabase.from("podcast_episodes").select("*").eq("published", true).order("created_at", { ascending: false });
   if (limit) query = query.limit(limit);
   const rows = await safeQuery<any[]>(query, []);
   return rows.map(mapPodcastEpisode);
@@ -89,14 +134,14 @@ export async function getPodcastEpisodes(limit?: number) {
 export async function getPodcastEpisodeBySlug(slug: string) {
   const supabase = getPublicClient();
   if (!supabase) return null;
-  const row = await safeQuery<any | null>(supabase.from("podcast_episodes").select("*").eq("slug", slug).maybeSingle(), null);
+  const row = await safeQuery<any | null>(supabase.from("podcast_episodes").select("*").eq("published", true).eq("slug", slug).maybeSingle(), null);
   return row ? mapPodcastEpisode(row) : null;
 }
 
 export async function getEvents(limit?: number) {
   const supabase = getPublicClient();
   if (!supabase) return [] as PublicEvent[];
-  let query: any = supabase.from("events").select("*").order("date", { ascending: true }).order("time", { ascending: true });
+  let query: any = supabase.from("events").select("*").eq("published", true).order("date", { ascending: true }).order("time", { ascending: true });
   if (limit) query = query.limit(limit);
   const rows = await safeQuery<any[]>(query, []);
   return rows.map(mapEvent);
@@ -105,7 +150,7 @@ export async function getEvents(limit?: number) {
 export async function getIndicators(limit?: number) {
   const supabase = getPublicClient();
   if (!supabase) return [] as PublicIndicator[];
-  let query: any = supabase.from("indicators").select("*").order("updated_at", { ascending: false });
+  let query: any = supabase.from("indicators").select("*").eq("published", true).order("updated_at", { ascending: false });
   if (limit) query = query.limit(limit);
   const rows = await safeQuery<any[]>(query, []);
   return rows.map(mapIndicator);

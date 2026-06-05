@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, CalendarDays, ClipboardList, Headphones, Home, Lightbulb, Newspaper, Settings, Sparkles, UsersRound } from "lucide-react";
+import { BarChart3, CalendarDays, ClipboardList, Headphones, Home, ImageIcon, LayoutTemplate, Lightbulb, Newspaper, Settings, Sparkles, UsersRound } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const links = [
   { href: "/admin", label: "Dashboard", icon: Home },
+  { href: "/admin/inicio", label: "Inicio", icon: LayoutTemplate },
+  { href: "/admin/media", label: "Media", icon: ImageIcon },
   { href: "/admin/proyectos", label: "Proyectos", icon: Lightbulb },
   { href: "/admin/historias", label: "Historias", icon: Newspaper },
   { href: "/admin/podcast", label: "Podcast", icon: Headphones },
