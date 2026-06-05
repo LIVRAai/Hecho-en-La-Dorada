@@ -61,10 +61,12 @@ Abre `http://localhost:3000`.
 4. Copia las llaves del proyecto en `.env.local`:
 
 ```env
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+NEXT_PUBLIC_SUPABASE_URL=https://nvidjyavggljuukjmmmf.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_mEutHNmodVNOLCoclP3MDA_6l8VDx93
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```
+
+`NEXT_PUBLIC_SUPABASE_ANON_KEY` puede usar la publishable key de Supabase porque está diseñada para ejecutarse en el navegador. No publiques `SUPABASE_SERVICE_ROLE_KEY`: esa llave es privada y solo debe configurarse en entornos seguros del servidor si se agrega lógica administrativa.
 
 El formulario de recomendaciones funciona en modo demo sin Supabase; si detecta variables configuradas, inserta en la tabla `recommendations` con estado `Pendiente`.
 
@@ -84,7 +86,10 @@ Los datos de interfaz viven en `lib/data.ts`; los seeds SQL de arranque viven en
 ## Despliegue en Vercel
 
 1. Conecta el repositorio en Vercel.
-2. Configura las variables de entorno de `.env.example`.
+2. Configura estas variables en **Project Settings → Environment Variables**:
+   - `NEXT_PUBLIC_SITE_URL=https://hechoenladorada.co`
+   - `NEXT_PUBLIC_SUPABASE_URL=https://nvidjyavggljuukjmmmf.supabase.co`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_mEutHNmodVNOLCoclP3MDA_6l8VDx93`
 3. Usa el comando de build por defecto:
 
 ```bash
@@ -92,6 +97,10 @@ npm run build
 ```
 
 4. Publica el dominio final y ajusta `NEXT_PUBLIC_SITE_URL` para Open Graph, sitemap y robots.
+
+## Nota de compatibilidad Vercel
+
+La app usa versiones estables de React 19 (`react` y `react-dom` en `19.0.0`) para que npm resuelva correctamente peer dependencies como `@tanstack/react-query` en Vercel. Evita volver a versiones React RC (`19.0.0-rc-*`) porque npm no las considera compatibles con rangos peer como `^19`.
 
 ## SEO
 
