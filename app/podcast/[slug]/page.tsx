@@ -1,0 +1,10 @@
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { Badge, SectionTitle } from "@/components/ui";
+import { PodcastCard, ProjectCard } from "@/components/cards";
+import { podcastEpisodes, projects } from "@/lib/data";
+
+type Props = { params: Promise<{ slug: string }> };
+export function generateStaticParams() { return podcastEpisodes.map((episode) => ({ slug: episode.slug })); }
+export async function generateMetadata({ params }: Props): Promise<Metadata> { const { slug } = await params; const episode = podcastEpisodes.find((e) => e.slug === slug); return { title: episode?.title ?? "Podcast", description: episode?.summary }; }
+export default async function PodcastDetail({ params }: Props) { const { slug } = await params; const episode = podcastEpisodes.find((e) => e.slug === slug); if (!episode) notFound(); const project = projects.find((p) => p.id === episode.projectId); return <article className="mx-auto max-w-7xl px-4 py-14"><Badge>{episode.category}</Badge><h1 className="mt-5 font-serif text-5xl font-black md:text-7xl">{episode.title}</h1><p className="mt-5 max-w-3xl text-xl leading-9 text-suave/70">{episode.summary}</p><div className="mt-10 grid gap-8 lg:grid-cols-2"><iframe title="Spotify" src={episode.spotifyUrl} className="h-80 w-full rounded-[2rem] bg-suave" /><iframe title="YouTube" src={episode.youtubeUrl} className="h-80 w-full rounded-[2rem] bg-suave" /></div><section className="mt-12 grid gap-8 lg:grid-cols-[1fr_0.9fr]"><div className="rounded-[2rem] bg-white p-8 shadow-editorial"><h2 className="font-serif text-3xl font-black">Frases destacadas</h2><ul className="mt-6 grid gap-4">{episode.highlights.map((highlight) => <li key={highlight} className="border-l-4 border-dorado pl-4 text-lg font-semibold text-tierra">{highlight}</li>)}</ul></div>{project && <ProjectCard project={project} />}</section><section className="mt-14"><SectionTitle eyebrow="Más episodios" title="Episodios relacionados" /><div className="grid gap-6 md:grid-cols-3">{podcastEpisodes.filter((e) => e.id !== episode.id).slice(0, 3).map((item) => <PodcastCard key={item.id} episode={item} />)}</div></section></article>; }
