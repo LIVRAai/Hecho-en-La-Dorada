@@ -9,13 +9,14 @@ export async function middleware(request: NextRequest) {
   const token = request.cookies.get("sb-access-token")?.value;
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!token || !url || !key) return redirectToLogin(request);
+  if (!url || !key) return redirectToLogin(request, "config");
+  if (!token) return redirectToLogin(request, "session");
 
   const user = await getSupabaseUser({ url, key, token });
-  if (!user?.id) return redirectToLogin(request);
+  if (!user?.id) return redirectToLogin(request, "session");
 
   const role = await getUserRole({ url, key, token, userId: user.id });
-  if (!allowedRoles.has(role ?? "")) return redirectToLogin(request);
+  if (!allowedRoles.has(role ?? "")) return redirectToLogin(request, "role");
 
   return NextResponse.next();
 }
@@ -47,10 +48,11 @@ async function getUserRole({ url, key, token, userId }: { url: string; key: stri
   }
 }
 
-function redirectToLogin(request: NextRequest) {
+function redirectToLogin(request: NextRequest, reason: "config" | "session" | "role" = "session") {
   const loginUrl = request.nextUrl.clone();
   loginUrl.pathname = "/admin/login";
   loginUrl.searchParams.set("redirectedFrom", request.nextUrl.pathname);
+  loginUrl.searchParams.set("reason", reason);
   return NextResponse.redirect(loginUrl);
 }
 

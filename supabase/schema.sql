@@ -122,6 +122,7 @@ alter table podcast_episodes add column if not exists published boolean not null
 alter table events add column if not exists published boolean not null default false;
 alter table indicators add column if not exists published boolean not null default false;
 
+alter table profiles enable row level security;
 alter table projects enable row level security;
 alter table stories enable row level security;
 alter table podcast_episodes enable row level security;
@@ -130,6 +131,7 @@ alter table indicators enable row level security;
 alter table opportunities enable row level security;
 alter table recommendations enable row level security;
 
+create policy "Users read own profile" on profiles for select using (auth.uid() = id);
 create policy "Public read projects" on projects for select using (published = true);
 create policy "Public read stories" on stories for select using (published = true);
 create policy "Public read podcast" on podcast_episodes for select using (published = true);

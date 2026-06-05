@@ -76,6 +76,7 @@ El formulario de recomendaciones inserta en la tabla `recommendations` con estad
 - Layout independiente con sidebar, header, métricas, tablas, filtros, formularios, biblioteca `/admin/media` y editor `/admin/inicio`.
 - Las operaciones administrativas usan la sesión del usuario, Supabase Storage y políticas RLS; no se expone `SUPABASE_SERVICE_ROLE_KEY` al navegador.
 - Para conceder acceso, crea el usuario en Supabase Auth y registra su perfil con rol `Administrador` o `Editor` en la tabla `profiles`.
+  Ejemplo SQL después de crear el usuario en Auth: `insert into profiles (id, full_name, role) values ('USER_UUID', 'Nombre', 'Administrador') on conflict (id) do update set role = excluded.role;`.
 
 ## CMS y publicación
 
