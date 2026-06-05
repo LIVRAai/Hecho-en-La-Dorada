@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { getSupabaseBrowserClient } from "@/lib/supabase";
-import { categories } from "@/lib/data";
+import { categories } from "@/lib/constants";
 
 const schema = z.object({ recommender_name: z.string().min(2), email: z.string().email(), phone: z.string().min(7), recommended_name: z.string().min(2), category: z.string().min(2), story: z.string().min(20), instagram: z.string().optional(), whatsapp: z.string().optional() });
 type FormValues = z.infer<typeof schema>;

@@ -23,7 +23,7 @@
 ```txt
 app/                      Rutas públicas, SEO, sitemap y robots
 components/               UI editorial reutilizable, cards, mapa y formularios
-lib/                      Datos demo, helpers y cliente Supabase
+lib/                      Tipos, consultas Supabase, helpers y cliente Supabase
 supabase/schema.sql       Esquema PostgreSQL, roles, RLS y políticas
 supabase/seed.sql         Semillas SQL iniciales
 .env.example              Variables de entorno necesarias
@@ -68,7 +68,7 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
 `NEXT_PUBLIC_SUPABASE_ANON_KEY` puede usar la publishable key de Supabase porque está diseñada para ejecutarse en el navegador. No publiques `SUPABASE_SERVICE_ROLE_KEY`: esa llave es privada y solo debe configurarse en entornos seguros del servidor si se agrega lógica administrativa.
 
-El formulario de recomendaciones funciona en modo demo sin Supabase; si detecta variables configuradas, inserta en la tabla `recommendations` con estado `Pendiente`.
+El formulario de recomendaciones inserta en la tabla `recommendations` con estado `Pendiente` cuando las variables públicas de Supabase están configuradas.
 
 ## Módulo administrador
 
@@ -78,18 +78,18 @@ El formulario de recomendaciones funciona en modo demo sin Supabase; si detecta 
 - Las operaciones administrativas usan la sesión del usuario y políticas RLS; no se expone `SUPABASE_SERVICE_ROLE_KEY` al navegador.
 - Para conceder acceso, crea el usuario en Supabase Auth y registra su perfil con rol `Administrador` o `Editor` en la tabla `profiles`.
 
-## Datos demo
+## Contenido real desde Supabase
 
-El MVP incluye datos demo inspirados en La Dorada:
+La página pública no usa contenido de ejemplo. Las rutas públicas consultan Supabase mediante `lib/public-data.ts` y, si las tablas están vacías, muestran estados vacíos elegantes.
 
-- 15 proyectos locales
-- 10 historias
-- 8 episodios de podcast
-- 10 eventos
-- 20 indicadores
-- 10 oportunidades
+- Proyectos: tabla `projects`.
+- Historias: tabla `stories`.
+- Podcast: tabla `podcast_episodes`.
+- Agenda: tabla `events`.
+- Datos: tabla `indicators`.
+- Oportunidades: tabla `opportunities` con estado `Publicada`.
 
-Los datos de interfaz viven en `lib/data.ts`; los seeds SQL de arranque viven en `supabase/seed.sql`.
+`supabase/seed.sql` queda vacío para producción; el contenido debe crearse desde el panel administrador o mediante migraciones privadas con datos reales.
 
 ## Despliegue en Vercel
 
