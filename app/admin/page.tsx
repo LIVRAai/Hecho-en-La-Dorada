@@ -1,7 +1,18 @@
-import type { Metadata } from "next";
-import { ClipboardList, Headphones, Lightbulb, Newspaper, Ticket, Users } from "lucide-react";
-import { SectionTitle } from "@/components/ui";
+import { CalendarDays, ClipboardList, Headphones, Lightbulb, Newspaper, UsersRound } from "lucide-react";
+import { AdminDataTable } from "@/components/admin/admin-data-table";
+import { AdminMetricCard } from "@/components/admin/admin-metric-card";
+import { adminModules, recommendations } from "@/lib/admin-data";
 import { events, opportunities, podcastEpisodes, projects, stories } from "@/lib/data";
-export const metadata: Metadata = { title: "Admin", description: "Panel administrador de Hecho en La Dorada." };
-const modules = ["Proyectos", "Historias", "Podcast", "Eventos", "Oportunidades", "Indicadores", "Recomendaciones"];
-export default function AdminPage() { const stats = [{ label: "Total proyectos", value: projects.length, icon: Lightbulb }, { label: "Total historias", value: stories.length, icon: Newspaper }, { label: "Total episodios", value: podcastEpisodes.length, icon: Headphones }, { label: "Total eventos", value: events.length, icon: Ticket }, { label: "Total oportunidades", value: opportunities.length, icon: ClipboardList }, { label: "Total recomendaciones", value: 0, icon: Users }]; return <section className="mx-auto max-w-7xl px-4 py-16"><SectionTitle eyebrow="Panel administrador" title="Gestión editorial y comunitaria" description="Dashboard inicial para roles Administrador, Editor y Usuario con CRUD proyectado para todos los módulos." /><div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">{stats.map(({ label, value, icon: Icon }) => <article key={label} className="rounded-[2rem] bg-white p-6 shadow-editorial"><Icon className="text-dorado" /><p className="mt-4 font-serif text-5xl font-black text-magdalena">{value}</p><p className="font-bold text-suave/70">{label}</p></article>)}</div><div className="mt-12 rounded-[2.5rem] bg-suave p-8 text-crema shadow-editorial"><h2 className="font-serif text-4xl font-black">CRUD completo previsto</h2><div className="mt-6 grid gap-3 md:grid-cols-3">{modules.map((module) => <div key={module} className="rounded-2xl bg-white/10 p-4 font-bold">{module}</div>)}</div><p className="mt-6 text-crema/65">Estados recomendados: Pendiente, Revisada, Contactada, Publicada y Descartada. La autenticación se implementa con Supabase Auth y políticas RLS en los scripts SQL.</p></div></section>; }
+
+export default function AdminPage() {
+  const metrics = [
+    { title: "Total proyectos", value: projects.length, description: "Iniciativas locales documentadas", icon: Lightbulb },
+    { title: "Total historias", value: stories.length, description: "Crónicas y piezas editoriales", icon: Newspaper },
+    { title: "Total episodios", value: podcastEpisodes.length, description: "Conversaciones del podcast", icon: Headphones },
+    { title: "Total eventos", value: events.length, description: "Actividades en agenda", icon: CalendarDays },
+    { title: "Recomendaciones pendientes", value: recommendations.filter((item) => item.status === "Pendiente").length, description: "Solicitudes por revisar", icon: UsersRound },
+    { title: "Oportunidades activas", value: opportunities.filter((item) => item.status === "Publicada").length, description: "Publicaciones visibles", icon: ClipboardList }
+  ];
+
+  return <div className="space-y-7"><section className="rounded-[2rem] bg-slate-950 p-8 text-white shadow-sm"><p className="text-xs font-black uppercase tracking-[0.3em] text-dorado">Dashboard</p><h2 className="mt-3 font-serif text-4xl font-black">Centro de gestión editorial</h2><p className="mt-3 max-w-3xl text-slate-300">Administra proyectos, historias, podcast, eventos, oportunidades, recomendaciones e indicadores sin mezclar el flujo interno con el sitio público.</p></section><section className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">{metrics.map((metric) => <AdminMetricCard key={metric.title} {...metric} />)}</section><section><div className="mb-4"><h3 className="font-serif text-3xl font-black">Gestión reciente</h3><p className="mt-2 text-slate-600">Vista rápida de recomendaciones entrantes y acciones de moderación.</p></div><AdminDataTable records={adminModules.recomendaciones.records} moduleSlug="recomendaciones" newLabel="Nueva recomendación" table="recommendations" /></section></div>;
+}

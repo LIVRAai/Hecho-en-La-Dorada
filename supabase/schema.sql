@@ -126,3 +126,25 @@ create policy "Public read events" on events for select using (true);
 create policy "Public read indicators" on indicators for select using (true);
 create policy "Public read published opportunities" on opportunities for select using (status = 'Publicada');
 create policy "Public insert recommendations" on recommendations for insert with check (status = 'Pendiente');
+
+create or replace function public.is_admin_or_editor()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.profiles
+    where id = auth.uid()
+    and role in ('Administrador', 'Editor')
+  );
+$$;
+
+create policy "Editors manage projects" on projects for all using (public.is_admin_or_editor()) with check (public.is_admin_or_editor());
+create policy "Editors manage stories" on stories for all using (public.is_admin_or_editor()) with check (public.is_admin_or_editor());
+create policy "Editors manage podcast" on podcast_episodes for all using (public.is_admin_or_editor()) with check (public.is_admin_or_editor());
+create policy "Editors manage events" on events for all using (public.is_admin_or_editor()) with check (public.is_admin_or_editor());
+create policy "Editors manage indicators" on indicators for all using (public.is_admin_or_editor()) with check (public.is_admin_or_editor());
+create policy "Editors manage opportunities" on opportunities for all using (public.is_admin_or_editor()) with check (public.is_admin_or_editor());
+create policy "Editors manage recommendations" on recommendations for all using (public.is_admin_or_editor()) with check (public.is_admin_or_editor());

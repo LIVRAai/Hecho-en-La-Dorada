@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
-import { Footer } from "@/components/footer";
-import { Navbar } from "@/components/navbar";
+import "leaflet/dist/leaflet.css";
 import { Providers } from "@/components/providers";
+import { SiteShell } from "@/components/site-shell";
 import { StructuredData } from "@/components/structured-data";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -30,9 +30,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="font-sans antialiased">
         <Providers>
           <StructuredData />
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
+          <SiteShell>{children}</SiteShell>
         </Providers>
       </body>
     </html>
