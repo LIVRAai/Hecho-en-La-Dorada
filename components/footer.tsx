@@ -1,0 +1,6 @@
+import Link from "next/link";
+import { ButtonLink } from "@/components/ui";
+
+export function Footer() {
+  return <footer className="mt-20 bg-suave text-crema"><div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 md:grid-cols-[1.3fr_1fr_1fr]"><div><p className="font-serif text-4xl font-black">HECHO EN LA DORADA</p><p className="mt-4 max-w-xl text-crema/70">Historias, personas y proyectos que construyen nuestra ciudad. Una plataforma comunitaria y editorial para mirar La Dorada con orgullo.</p><div className="mt-6"><ButtonLink href="/recomendar">Recomendar una historia</ButtonLink></div></div><div><p className="font-bold">Explorar</p><div className="mt-4 grid gap-2 text-crema/70"><Link href="/hecho-en-la-dorada">Proyectos</Link><Link href="/historias">Historias</Link><Link href="/agenda">Agenda cultural</Link><Link href="/mapa">Mapa interactivo</Link></div></div><div><p className="font-bold">Crecer</p><div className="mt-4 grid gap-2 text-crema/70"><Link href="/datos">La Dorada en datos</Link><Link href="/oportunidades">Oportunidades</Link><Link href="/admin">Admin</Link></div></div></div><div className="border-t border-white/10 px-4 py-5 text-center text-sm text-crema/50">© 2026 Hecho en La Dorada. MVP editorial.</div></footer>;
+}
