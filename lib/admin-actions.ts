@@ -21,7 +21,9 @@ export async function saveAdminRecord(input: unknown) {
   const supabase = await getSupabaseServerClient();
   const { table, id, ...values } = parsed.data;
   const payload = toTablePayload(table, values);
-  const query = id ? supabase.from(table).update(payload).eq("id", id) : supabase.from(table).insert(payload);
+  const query = id
+    ? supabase.from(table as any).update(payload as any).eq("id", id)
+    : supabase.from(table as any).insert(payload as any);
   const { error } = await query;
 
   if (error) return { ok: false, message: error.message };
@@ -34,7 +36,7 @@ export async function deleteAdminRecord(input: { table: string; id: string }) {
   if (!parsed.success) return { ok: false, message: "Datos inválidos" };
 
   const supabase = await getSupabaseServerClient();
-  const { error } = await supabase.from(parsed.data.table).delete().eq("id", parsed.data.id);
+  const { error } = await supabase.from(parsed.data.table as any).delete().eq("id", parsed.data.id);
   if (error) return { ok: false, message: error.message };
 
   revalidatePath("/admin");
@@ -53,7 +55,7 @@ export async function updateRecommendationStatus(id: string, status: string) {
   return { ok: true, message: "Estado actualizado" };
 }
 
-function toTablePayload(table: z.infer<typeof tableSchema>, values: { title: string; category: string; status?: string; description?: string }) {
+function toTablePayload(table: string, values: { title: string; category: string; status?: string; description?: string }): Record<string, unknown> {
   const slug = values.title.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
   switch (table) {
     case "projects":
@@ -70,5 +72,7 @@ function toTablePayload(table: z.infer<typeof tableSchema>, values: { title: str
       return { recommender_name: "Admin", email: "admin@hechoenladorada.co", recommended_name: values.title, category: values.category, story: values.description ?? values.title, status: values.status ?? "Pendiente" };
     case "indicators":
       return { title: values.title, value: "Pendiente", category: values.category, description: values.description };
+    default:
+      return { title: values.title, category: values.category, description: values.description };
   }
 }
