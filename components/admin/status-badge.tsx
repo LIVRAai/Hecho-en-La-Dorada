@@ -6,7 +6,6 @@ const styles: Record<string, string> = {
   Contactada: "bg-violet-100 text-violet-800",
   Publicada: "bg-emerald-100 text-emerald-800",
   Descartada: "bg-rose-100 text-rose-800",
-  Activa: "bg-emerald-100 text-emerald-800",
   Borrador: "bg-slate-200 text-slate-700"
 };
 

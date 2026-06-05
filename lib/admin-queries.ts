@@ -26,7 +26,7 @@ export async function getAdminCounts() {
     podcast: data.podcast_episodes?.length ?? 0,
     events: data.events?.length ?? 0,
     pendingRecommendations: (data.recommendations ?? []).filter((item) => item.status === "Pendiente").length,
-    activeOpportunities: (data.opportunities ?? []).filter((item) => item.status === "Publicada" || item.status === "Activa").length,
+    activeOpportunities: (data.opportunities ?? []).filter((item) => item.status === "Publicada").length,
     recommendations: data.recommendations ?? []
   };
 }

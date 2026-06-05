@@ -3,18 +3,20 @@ import { AdminForm } from "@/components/admin/admin-form";
 import { adminModules } from "@/lib/admin-data";
 import { getAdminRecords } from "@/lib/admin-queries";
 
-const tableMap: Record<string, "projects" | "stories" | "podcast_episodes" | "events" | "opportunities" | "recommendations" | "indicators"> = {
+type AdminContentModule = "proyectos" | "historias" | "podcast" | "eventos" | "oportunidades" | "recomendaciones" | "indicadores";
+type AdminTableName = "projects" | "stories" | "podcast_episodes" | "events" | "opportunities" | "recommendations" | "indicators";
+
+const tableMap: Record<AdminContentModule, AdminTableName> = {
   proyectos: "projects",
   historias: "stories",
   podcast: "podcast_episodes",
   eventos: "events",
   oportunidades: "opportunities",
   recomendaciones: "recommendations",
-  indicadores: "indicators",
-  configuracion: "indicators"
+  indicadores: "indicators"
 };
 
-export async function AdminModulePage({ moduleSlug }: { moduleSlug: keyof typeof adminModules }) {
+export async function AdminModulePage({ moduleSlug }: { moduleSlug: AdminContentModule }) {
   const module = adminModules[moduleSlug];
   const table = tableMap[moduleSlug];
   const records = await getAdminRecords(table);

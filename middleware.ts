@@ -1,41 +1,50 @@
-import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+
+const allowedRoles = new Set(["Administrador", "Editor"]);
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  if (!pathname.startsWith("/admin") || pathname === "/admin/login") return NextResponse.next();
 
-  if (!pathname.startsWith("/admin") || pathname === "/admin/login") {
-    return NextResponse.next();
-  }
-
-  let response = NextResponse.next({ request });
+  const token = request.cookies.get("sb-access-token")?.value;
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!token || !url || !key) return redirectToLogin(request);
 
-  if (!url || !key) {
-    return redirectToLogin(request);
+  const user = await getSupabaseUser({ url, key, token });
+  if (!user?.id) return redirectToLogin(request);
+
+  const role = await getUserRole({ url, key, token, userId: user.id });
+  if (!allowedRoles.has(role ?? "")) return redirectToLogin(request);
+
+  return NextResponse.next();
+}
+
+async function getSupabaseUser({ url, key, token }: { url: string; key: string; token: string }) {
+  try {
+    const response = await fetch(`${url}/auth/v1/user`, {
+      headers: { apikey: key, Authorization: `Bearer ${token}` },
+      cache: "no-store"
+    });
+    if (!response.ok) return null;
+    return await response.json() as { id?: string };
+  } catch {
+    return null;
   }
+}
 
-  const supabase = createServerClient(url, key, {
-    cookies: {
-      getAll() {
-        return request.cookies.getAll();
-      },
-      setAll(cookiesToSet: Array<{ name: string; value: string; options?: any }>) {
-        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-        response = NextResponse.next({ request });
-        cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
-      }
-    }
-  });
-
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    return redirectToLogin(request);
+async function getUserRole({ url, key, token, userId }: { url: string; key: string; token: string; userId: string }) {
+  try {
+    const response = await fetch(`${url}/rest/v1/profiles?select=role&id=eq.${encodeURIComponent(userId)}&limit=1`, {
+      headers: { apikey: key, Authorization: `Bearer ${token}` },
+      cache: "no-store"
+    });
+    if (!response.ok) return null;
+    const rows = await response.json() as Array<{ role?: string }>;
+    return rows[0]?.role ?? null;
+  } catch {
+    return null;
   }
-
-  return response;
 }
 
 function redirectToLogin(request: NextRequest) {
@@ -45,6 +54,4 @@ function redirectToLogin(request: NextRequest) {
   return NextResponse.redirect(loginUrl);
 }
 
-export const config = {
-  matcher: ["/admin/:path*"]
-};
+export const config = { matcher: ["/admin/:path*"] };
