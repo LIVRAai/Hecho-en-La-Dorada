@@ -1,0 +1,2 @@
+-- Production seed intentionally left empty.
+-- Add real content from the admin panel or your own private migration scripts.
