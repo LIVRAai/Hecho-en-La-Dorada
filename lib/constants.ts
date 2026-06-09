@@ -1,0 +1,1 @@
+export const categories = ["Emprendimiento", "Cultura", "Arte", "Turismo", "Educación", "Tecnología", "Gastronomía", "Comercio", "Industria", "Agro", "Moda", "Bienestar", "Impacto Social", "Deporte"];
