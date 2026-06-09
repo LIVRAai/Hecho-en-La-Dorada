@@ -8,7 +8,7 @@ export async function ensureMediaBucket() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  if (!url || !serviceKey) {
+  if (!url || !isConfiguredServiceKey(serviceKey)) {
     return {
       ok: false,
       message: "El bucket media no existe. Créalo en Supabase Storage o configura SUPABASE_SERVICE_ROLE_KEY en Vercel para que el servidor pueda crearlo automáticamente."
@@ -36,4 +36,8 @@ export async function ensureMediaBucket() {
 
   if (error) return { ok: false, message: error.message };
   return { ok: true, message: "Bucket media creado correctamente." };
+}
+
+function isConfiguredServiceKey(key: string | undefined): key is string {
+  return Boolean(key && !key.startsWith("opcional") && (key.startsWith("eyJ") || key.startsWith("sb_secret_")));
 }
