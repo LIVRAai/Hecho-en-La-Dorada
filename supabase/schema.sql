@@ -131,6 +131,10 @@ alter table indicators enable row level security;
 alter table opportunities enable row level security;
 alter table recommendations enable row level security;
 
+insert into storage.buckets (id, name, public)
+values ('media', 'media', true)
+on conflict (id) do update set public = true;
+
 create policy "Users read own profile" on profiles for select using (auth.uid() = id);
 create policy "Public read projects" on projects for select using (published = true);
 create policy "Public read stories" on stories for select using (published = true);

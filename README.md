@@ -65,7 +65,7 @@ NEXT_PUBLIC_SUPABASE_URL=https://nvidjyavggljuukjmmmf.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_mEutHNmodVNOLCoclP3MDA_6l8VDx93
 ```
 
-`NEXT_PUBLIC_SUPABASE_ANON_KEY` puede usar la publishable key de Supabase porque está diseñada para ejecutarse en el navegador. Esta implementación no requiere `SUPABASE_SERVICE_ROLE_KEY`; si agregas una llave de servicio en el futuro, mantenla solo en entornos seguros del servidor y nunca en componentes cliente.
+`NEXT_PUBLIC_SUPABASE_ANON_KEY` puede usar la publishable key de Supabase porque está diseñada para ejecutarse en el navegador. La app funciona con la publishable key para Auth y lecturas públicas. `SUPABASE_SERVICE_ROLE_KEY` es opcional y solo se usa del lado servidor para crear/verificar automáticamente el bucket `media`; nunca debe exponerse en componentes cliente.
 
 El formulario de recomendaciones inserta en la tabla `recommendations` con estado `Pendiente` cuando las variables públicas de Supabase están configuradas.
 
@@ -80,7 +80,7 @@ El formulario de recomendaciones inserta en la tabla `recommendations` con estad
 
 ## CMS y publicación
 
-- `/admin/media` sube imágenes al bucket público `media`, permite previsualizar, copiar URL y eliminar archivos.
+- `/admin/media` sube imágenes al bucket público `media`, permite previsualizar, copiar URL y eliminar archivos. Si aparece “Bucket not found”, ejecuta `supabase/schema.sql`, crea manualmente el bucket `media` en Supabase Storage o configura `SUPABASE_SERVICE_ROLE_KEY` solo en el servidor para que el CMS lo cree automáticamente.
 - `/admin/inicio` edita el hero público desde la tabla `site_home`.
 - Los formularios admin guardan contenido real en Supabase y usan `published` para mostrarlo en la web pública.
 - La página pública solo muestra proyectos, historias, episodios, eventos e indicadores con `published = true`; oportunidades usan `status = 'Publicada'`.
